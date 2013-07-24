@@ -104,7 +104,7 @@ clf = svm.SVC(kernel='linear')
 
 k_fold = cross_validation.KFold(len(category_dataset), n_folds=10)
 data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
-outfile = codecs.open(data_name + '_train_result.txt', 'w', 'utf-8')
+outfile = codecs.open('report/' + data_name + '_train_result.txt', 'w', 'utf-8')
 
 i = 1
 for train_index_list, test_index_list in k_fold:
