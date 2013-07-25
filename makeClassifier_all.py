@@ -16,9 +16,6 @@ conn = MySQLdb.connect(host="localhost",
                        db="WFProject",
                        charset="utf8")
 
-# Database number in View list
-db_num = 4
-
 
 # Get TFIDF Score Vector by CHI term list
 def getTDIDFScoreVector(chi_zero_list, term_tfidf_list):
@@ -70,30 +67,34 @@ chi_zero_list = dict.fromkeys(filted_avg_list, 0.0)
 # Get database View List
 tfidf_viewlist = obj_db.getTFIDFViewList()
 
-sql_getContent = "SELECT `ClsNo1`, `ScoreContent` FROM `" + tfidf_viewlist[db_num] + "` ORDER BY RAND()"
-
 # Get connection cursor
 view_cursor = conn.cursor()
 
-# Execute the SQL statement
-view_cursor.execute(sql_getContent)
-
-# Get All result
-view_results = view_cursor.fetchall()
-
+# Init empty set for training and testing
 feature_dataset = []
 category_dataset = []
-for view_row in view_results:
-    view_content = view_row[1]
-    term_tfidf_list = view_content.split("|")
-    tfidf_score_vector = getTDIDFScoreVector(chi_zero_list, term_tfidf_list)
 
-    feature_dataset.append(tfidf_score_vector)
-    category_dataset.append(int(view_row[0]))
+for db_num in range(0, 5):
+    print db_num
+    sql_getContent = "SELECT `ClsNo1`, `ScoreContent` FROM `" + tfidf_viewlist[db_num] + "` ORDER BY RAND()"
 
-print len(feature_dataset)
-print len(category_dataset)
-"""print category_dataset"""
+    # Execute the SQL statement
+    view_cursor.execute(sql_getContent)
+
+    # Get All result
+    view_results = view_cursor.fetchall()
+
+    for view_row in view_results:
+        view_content = view_row[1]
+        term_tfidf_list = view_content.split("|")
+        tfidf_score_vector = getTDIDFScoreVector(chi_zero_list, term_tfidf_list)
+
+        feature_dataset.append(tfidf_score_vector)
+        category_dataset.append(int(view_row[0]))
+
+    print len(feature_dataset)
+    print len(category_dataset)
+    """print category_dataset"""
 
 """
 Use Scikit-learn python Mechine learning libreary to learning
@@ -103,8 +104,8 @@ clf = svm.SVC(kernel='linear')
 # clf.fit(feature_dataset, category_dataset)
 
 k_fold = cross_validation.KFold(len(category_dataset), n_folds=10)
-data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
-outfile = codecs.open('report/' + data_name + '_train_result.txt', 'w', 'utf-8')
+
+outfile = codecs.open('report/all_train_result.txt', 'w', 'utf-8')
 
 i = 1
 for train_index_list, test_index_list in k_fold:
@@ -112,7 +113,7 @@ for train_index_list, test_index_list in k_fold:
     train_set = getValiSetByIndexList(feature_dataset, category_dataset, train_index_list)
     clf.fit(train_set[0], train_set[1])
 
-    joblib.dump(clf, 'pickle/' + data_name + '_train_' + str(i) + '.pkl', compress=9)
+    joblib.dump(clf, 'pickle/all_train_' + str(i) + '.pkl', compress=9)
 
     test_set = getValiSetByIndexList(feature_dataset, category_dataset, test_index_list)
 
