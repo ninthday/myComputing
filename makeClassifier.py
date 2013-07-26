@@ -18,6 +18,7 @@ conn = MySQLdb.connect(host="localhost",
 
 # Database number in View list
 db_num = 4
+filter_num = 0.027
 
 
 # Get TFIDF Score Vector by CHI term list
@@ -62,7 +63,7 @@ avg_chi_list = obj_dims.getAvgCHIList()
 max_chi_list = obj_dims.getMaxCHIList()
 
 # Filter list by CHI score
-filted_avg_list = obj_dims.doFilteredList(0.028, avg_chi_list)
+filted_avg_list = obj_dims.doFilteredList(filter_num, avg_chi_list)
 
 # Reset all values in dictionary
 chi_zero_list = dict.fromkeys(filted_avg_list, 0.0)
@@ -106,6 +107,9 @@ k_fold = cross_validation.KFold(len(category_dataset), n_folds=10)
 data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
 outfile = codecs.open('report/' + data_name + '_train_result.txt', 'w', 'utf-8')
 
+outfile.write('Avg CHI Static Score: ' + str(filter_num) + "\n")
+outfile.write('Length of vector dimension: ' + str(len(filted_avg_list)) + "\n\n")
+
 i = 1
 for train_index_list, test_index_list in k_fold:
     print str(i) + '-times Training --------------------------------'
@@ -128,3 +132,6 @@ for train_index_list, test_index_list in k_fold:
     i += 1
 
 outfile.close()
+
+view_cursor.close()
+conn.close()
