@@ -17,7 +17,7 @@ conn = MySQLdb.connect(host="localhost",
                        charset="utf8")
 
 # Database number in View list
-db_num = 4
+db_num = 0
 filter_num = 0.11
 
 
@@ -102,10 +102,11 @@ Use Scikit-learn python Mechine learning libreary to learning
 clf = svm.SVC(kernel='linear')
 # clf.fit(feature_dataset, category_dataset)
 
-k_fold = cross_validation.KFold(len(category_dataset), n_folds=10)
+k_fold = cross_validation.KFold(len(category_dataset), n_folds=5)
 data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
 outfile = codecs.open('report/max_' + data_name + '_train_result.txt', 'w', 'utf-8')
 
+outfile.write("Cross-validation: 5-fold CV\n")
 outfile.write('Max CHI Static Score filter: ' + str(filter_num) + "\n")
 outfile.write('Length of vector dimension: ' + str(len(filted_avg_list)) + "\n\n")
 

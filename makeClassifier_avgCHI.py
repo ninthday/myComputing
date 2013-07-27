@@ -17,7 +17,7 @@ conn = MySQLdb.connect(host="localhost",
                        charset="utf8")
 
 # Database number in View list
-db_num = 4
+db_num = 0
 filter_num = 0.027
 
 
@@ -92,8 +92,8 @@ for view_row in view_results:
     feature_dataset.append(tfidf_score_vector)
     category_dataset.append(int(view_row[0]))
 
-print len(feature_dataset)
-print len(category_dataset)
+print 'feature_dataset:' + str(len(feature_dataset))
+print 'category_datase:' + str(len(category_dataset))
 """print category_dataset"""
 
 """
@@ -103,10 +103,11 @@ Use Scikit-learn python Mechine learning libreary to learning
 clf = svm.SVC(kernel='linear')
 # clf.fit(feature_dataset, category_dataset)
 
-k_fold = cross_validation.KFold(len(category_dataset), n_folds=10)
+k_fold = cross_validation.KFold(len(category_dataset), n_folds=5)
 data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
-outfile = codecs.open('report/' + data_name + '_train_result.txt', 'w', 'utf-8')
+outfile = codecs.open('report/avg_' + data_name + '_train_result.txt', 'w', 'utf-8')
 
+outfile.write("Cross-validation: 5-fold CV\n")
 outfile.write('Avg CHI Static Score: ' + str(filter_num) + "\n")
 outfile.write('Length of vector dimension: ' + str(len(filted_avg_list)) + "\n\n")
 
@@ -116,7 +117,7 @@ for train_index_list, test_index_list in k_fold:
     train_set = getValiSetByIndexList(feature_dataset, category_dataset, train_index_list)
     clf.fit(train_set[0], train_set[1])
 
-    joblib.dump(clf, 'pickle/' + data_name + '_train_' + str(i) + '.pkl', compress=9)
+    joblib.dump(clf, 'pickle/avg_' + data_name + '_train_' + str(i) + '.pkl', compress=9)
 
     test_set = getValiSetByIndexList(feature_dataset, category_dataset, test_index_list)
 
