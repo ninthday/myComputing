@@ -37,3 +37,4 @@ nosetests.xml
 # Ignore Pickle and Report
 pickle/*
 report/*
+bak/*

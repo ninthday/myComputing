@@ -17,8 +17,8 @@ conn = MySQLdb.connect(host="localhost",
                        charset="utf8")
 
 # Database number in View list
-db_num = 0
-filter_num = 0.11
+db_num = 2
+filter_num = 0.15
 
 
 # Get TFIDF Score Vector by CHI term list
@@ -102,21 +102,27 @@ Use Scikit-learn python Mechine learning libreary to learning
 clf = svm.SVC(kernel='linear')
 # clf.fit(feature_dataset, category_dataset)
 
+"""
 k_fold = cross_validation.KFold(len(category_dataset), n_folds=5)
+"""
+sk_fold = cross_validation.StratifiedKFold(category_dataset, n_folds=5)
 data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
-outfile = codecs.open('report/max_' + data_name + '_train_result.txt', 'w', 'utf-8')
+outfile = codecs.open('report/max_sk_' + data_name + '_train_result.txt', 'w', 'utf-8')
 
-outfile.write("Cross-validation: 5-fold CV\n")
+outfile.write("Cross-validation: Stratified 5-fold CV\n")
 outfile.write('Max CHI Static Score filter: ' + str(filter_num) + "\n")
 outfile.write('Length of vector dimension: ' + str(len(filted_avg_list)) + "\n\n")
 
 i = 1
+"""
 for train_index_list, test_index_list in k_fold:
+"""
+for train_index_list, test_index_list in sk_fold:
     print str(i) + '-times Training --------------------------------'
     train_set = getValiSetByIndexList(feature_dataset, category_dataset, train_index_list)
     clf.fit(train_set[0], train_set[1])
 
-    joblib.dump(clf, 'pickle/max_' + data_name + '_train_' + str(i) + '.pkl', compress=9)
+    joblib.dump(clf, 'pickle/max_sk_' + data_name + '_train_' + str(i) + '.pkl', compress=9)
 
     test_set = getValiSetByIndexList(feature_dataset, category_dataset, test_index_list)
 

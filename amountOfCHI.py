@@ -4,7 +4,7 @@
 from filter import dimension
 
 # Set amount for get average CHI score
-amtNum = 1000
+amtNum = 7000
 
 # Instance dimension Class
 obj_dims = dimension()
@@ -22,6 +22,7 @@ for key, value in sorted(dict_avg_chi.items(), key=lambda(k, v): (v, k), reverse
     if i > 100:
         break
 """
+# Sort Avg CHI Score dictionary by value
 sorted_avg_chi = sorted(dict_avg_chi.items(), key=lambda(k, v): (v, k), reverse=True)
 
 i = 1
@@ -31,6 +32,7 @@ for key, value in sorted_avg_chi:
         break
     i += 1
 
+# Sort Max CHI Score dictionary by value
 sorted_max_chi = sorted(dict_max_chi.items(), key=lambda(k, v): (v, k), reverse=True)
 
 i = 1
