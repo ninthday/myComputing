@@ -5,9 +5,11 @@ from filter import dimension
 from wfDatabase import wfdb
 from sklearn import svm, cross_validation
 from sklearn.externals import joblib
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, f1_score
 import MySQLdb
 import codecs
+import numpy as np
+import scipy.stats as sp
 
 # Create a connection
 conn = MySQLdb.connect(host="localhost",
@@ -17,7 +19,7 @@ conn = MySQLdb.connect(host="localhost",
                        charset="utf8")
 
 # Database number in View list
-db_num = 2
+"""db_num = 2"""
 filter_num = 0.15
 
 
@@ -52,92 +54,135 @@ def getValiSetByIndexList(src_data_list, src_target_list, index_list):
         rtn_target_list.append(src_target_list[idx])
     return rtn_data_list, rtn_target_list
 
+
+# Get confidence interval
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0 * np.array(data)
+    n = len(a)
+    m, se = np.mean(a), sp.sem(a)
+    h = se * sp.t._ppf((1 + confidence) / 2., n - 1)
+    return [m, h, m - h, m + h]
+
 # Instance dimension class
 obj_dims = dimension()
 
-# Instance dimension class
+# Instance Database list class
 obj_db = wfdb()
 
-# Get Average CHI Score Dictionary list
+# Get Max CHI Score Dictionary list
 max_chi_list = obj_dims.getMaxCHIList()
 
 # Filter list by CHI score
-filted_avg_list = obj_dims.doFilteredList(filter_num, max_chi_list)
-
-# Reset all values in dictionary
-chi_zero_list = dict.fromkeys(filted_avg_list, 0.0)
+filted_max_list = obj_dims.doFilteredList(filter_num, max_chi_list)
 
 # Get database View List
 tfidf_viewlist = obj_db.getTFIDFViewList()
 
-sql_getContent = "SELECT `ClsNo1`, `ScoreContent` FROM `" + tfidf_viewlist[db_num] + "` ORDER BY RAND()"
+# Length of vector dimension
+len_vd = len(filted_max_list)
 
-# Get connection cursor
-view_cursor = conn.cursor()
+for db_num in range(5):
+    # Reset all values in dictionary
+    chi_zero_list = dict.fromkeys(filted_max_list, 0.0)
 
-# Execute the SQL statement
-view_cursor.execute(sql_getContent)
+    sql_getContent = "SELECT `ClsNo1`, `ScoreContent` FROM `" + tfidf_viewlist[db_num] + "` ORDER BY RAND()"
 
-# Get All result
-view_results = view_cursor.fetchall()
+    # Get connection cursor
+    view_cursor = conn.cursor()
 
-feature_dataset = []
-category_dataset = []
-for view_row in view_results:
-    view_content = view_row[1]
-    term_tfidf_list = view_content.split("|")
-    tfidf_score_vector = getTDIDFScoreVector(chi_zero_list, term_tfidf_list)
+    # Execute the SQL statement
+    view_cursor.execute(sql_getContent)
 
-    feature_dataset.append(tfidf_score_vector)
-    category_dataset.append(int(view_row[0]))
+    # Get All result
+    view_results = view_cursor.fetchall()
 
-print 'feature_dataset:' + str(len(feature_dataset))
-print 'category_datase:' + str(len(category_dataset))
-"""print category_dataset"""
+    feature_dataset = []
+    category_dataset = []
+    for view_row in view_results:
+        view_content = view_row[1]
+        term_tfidf_list = view_content.split("|")
+        tfidf_score_vector = getTDIDFScoreVector(chi_zero_list, term_tfidf_list)
 
-"""
-Use Scikit-learn python Mechine learning libreary to learning
-"""
-# Use scikit-learn libreary to build classfiler
-clf = svm.SVC(kernel='linear')
-# clf.fit(feature_dataset, category_dataset)
+        feature_dataset.append(tfidf_score_vector)
+        category_dataset.append(int(view_row[0]))
 
-"""
-k_fold = cross_validation.KFold(len(category_dataset), n_folds=5)
-"""
-sk_fold = cross_validation.StratifiedKFold(category_dataset, n_folds=5)
-data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
-outfile = codecs.open('report/max_sk_' + data_name + '_train_result.txt', 'w', 'utf-8')
+    print 'feature_dataset:' + str(len(feature_dataset))
+    print 'category_datase:' + str(len(category_dataset))
+    """print category_dataset"""
 
-outfile.write("Cross-validation: Stratified 5-fold CV\n")
-outfile.write('Max CHI Static Score filter: ' + str(filter_num) + "\n")
-outfile.write('Length of vector dimension: ' + str(len(filted_avg_list)) + "\n\n")
-
-i = 1
-"""
-for train_index_list, test_index_list in k_fold:
-"""
-for train_index_list, test_index_list in sk_fold:
-    print str(i) + '-times Training --------------------------------'
-    train_set = getValiSetByIndexList(feature_dataset, category_dataset, train_index_list)
-    clf.fit(train_set[0], train_set[1])
-
-    joblib.dump(clf, 'pickle/max_sk_' + data_name + '_train_' + str(i) + '.pkl', compress=9)
-
-    test_set = getValiSetByIndexList(feature_dataset, category_dataset, test_index_list)
-
-    pred_result = clf.predict(test_set[0])
-    print (classification_report(test_set[1], pred_result))
-
-    outfile.write(str(i) + '-times Training --------------------------------' + "\n")
-    outfile.write((classification_report(test_set[1], pred_result)) + "\n\n")
     """
-    target_names = ['class 1', 'class 2', 'class 3', 'class 4', 'class 5', 'class 6', 'class 7', 'class 8', 'class 9']
-    print (classification_report(test_set[1], pred_result, target_names=target_names))
+    Use Scikit-learn python Mechine learning libreary to learning
     """
-    i += 1
+    # Use scikit-learn libreary to build classfiler
+    clf = svm.SVC(kernel='linear')
+    # clf.fit(feature_dataset, category_dataset)
 
-outfile.close()
+    """
+    k_fold = cross_validation.KFold(len(category_dataset), n_folds=5)
+    """
+    sk_fold = cross_validation.StratifiedKFold(category_dataset, n_folds=10)
+    data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
+    print data_name + ":::::::::::::::::::::::::::::::"
+    outfile = codecs.open('report/max_sk_' + data_name + '_' + str(len_vd) + '_train_result.txt', 'w', 'utf-8')
 
-view_cursor.close()
+    outfile.write("Cross-validation: Stratified 10-fold CV\n")
+    outfile.write('Max CHI Static Score filter: ' + str(filter_num) + "\n")
+    outfile.write('Length of vector dimension: ' + str(len(len_vd)) + "\n\n")
+
+    i = 1
+    """
+    for train_index_list, test_index_list in k_fold:
+    """
+    # Set dictionary and list for computing confidence interval
+    dict_all_f1Soc = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: []}
+    list_wegt_avg_f1Soc = []
+    for train_index_list, test_index_list in sk_fold:
+        print str(i) + '-times Training --------------------------------'
+        train_set = getValiSetByIndexList(feature_dataset, category_dataset, train_index_list)
+        clf.fit(train_set[0], train_set[1])
+
+        joblib.dump(clf, 'pickle/max_sk_' + data_name + '_' + str(len_vd) + '_train_' + str(i) + '.pkl', compress=9)
+
+        test_set = getValiSetByIndexList(feature_dataset, category_dataset, test_index_list)
+
+        pred_result = clf.predict(test_set[0])
+        print (classification_report(test_set[1], pred_result))
+
+        outfile.write(str(i) + '-times Training --------------------------------' + "\n")
+        outfile.write((classification_report(test_set[1], pred_result)) + "\n\n")
+        """
+        target_names = ['class 1', 'class 2', 'class 3', 'class 4', 'class 5', 'class 6', 'class 7', 'class 8', 'class 9']
+        print (classification_report(test_set[1], pred_result, target_names=target_names))
+        """
+        result_f1Soc = f1_score(test_set[1], pred_result, average=None)
+        result_category = sorted(list(set(test_set[1])))
+        dict_f1Soc = dict(zip(result_category, result_f1Soc))
+
+        # Weighted Average F1-measure of the all category
+        list_wegt_avg_f1Soc.append(f1_score(test_set[1], pred_result, average='weighted'))
+        print result_category
+        print dict_f1Soc
+        outfile.write(str(dict_f1Soc) + "\n\n")
+
+        # Put value into dictionary that was All category F1-measure score
+        for k in range(1, 10):
+            if k in dict_f1Soc:
+                dict_all_f1Soc[k].append(dict_f1Soc[k])
+            else:
+                dict_all_f1Soc[k].append(0.0)
+        i += 1
+
+    # Show each category F1-measure score and 95% confidence interval
+    outfile.write("Category:\tF1-measure Score\n")
+    for key, value in dict_all_f1Soc.items():
+        mean_ci = mean_confidence_interval(value, 0.95)
+        print "C" + str(key) + ":\t\t%.2f +- %.2f" % (round(mean_ci[0], 2), round(mean_ci[1], 2))
+        outfile.write("C" + str(key) + ":\t\t%.2f +- %.2f \n" % (round(mean_ci[0], 2), round(mean_ci[1], 2)))
+    avg_mean_ci = mean_confidence_interval(list_wegt_avg_f1Soc, 0.95)
+    outfile.write("avg / total\t%.2f +- %.2f" % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
+    print "avg / total\t%.2f +- %.2f" % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2))
+
+    outfile.close()
+
+    view_cursor.close()
 conn.close()

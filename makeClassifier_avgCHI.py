@@ -133,8 +133,9 @@ for db_num in range(5):
     """
     for train_index_list, test_index_list in k_fold:
     """
+    # Set dictionary and list for computing confidence interval
     dict_all_f1Soc = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: []}
-    list_macro_avg_f1Soc = []
+    list_wegt_avg_f1Soc = []
     for train_index_list, test_index_list in sk_fold:
         print str(i) + '-times Training --------------------------------'
         train_set = getValiSetByIndexList(feature_dataset, category_dataset, train_index_list)
@@ -158,11 +159,12 @@ for db_num in range(5):
         dict_f1Soc = dict(zip(result_category, result_f1Soc))
 
         # Weighted Average F1-measure of the all category
-        list_macro_avg_f1Soc.append(f1_score(test_set[1], pred_result, average='weighted'))
+        list_wegt_avg_f1Soc.append(f1_score(test_set[1], pred_result, average='weighted'))
         print result_category
         print dict_f1Soc
         outfile.write(str(dict_f1Soc) + "\n\n")
 
+        # Put value into dictionary that was all category F1-measure score
         for k in range(1, 10):
             if k in dict_f1Soc:
                 dict_all_f1Soc[k].append(dict_f1Soc[k])
@@ -173,10 +175,10 @@ for db_num in range(5):
     # Show each category F1-measure score and 95% confidence interval
     outfile.write("Category:\tF1-measure Score\n")
     for key, value in dict_all_f1Soc.items():
-        mean_ci = mean_confidence_interval(value)
+        mean_ci = mean_confidence_interval(value, 0.95)
         print "C" + str(key) + ":\t\t%.2f +- %.2f" % (round(mean_ci[0], 2), round(mean_ci[1], 2))
         outfile.write("C" + str(key) + ":\t\t%.2f +- %.2f \n" % (round(mean_ci[0], 2), round(mean_ci[1], 2)))
-    avg_mean_ci = mean_confidence_interval(list_macro_avg_f1Soc)
+    avg_mean_ci = mean_confidence_interval(list_wegt_avg_f1Soc, 0.95)
     outfile.write("avg / total\t%.2f +- %.2f" % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
     print "avg / total\t%.2f +- %.2f" % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2))
 
