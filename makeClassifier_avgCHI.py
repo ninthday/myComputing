@@ -75,12 +75,16 @@ avg_chi_list = obj_dims.getAvgCHIList()
 # Filter list by CHI score
 filted_avg_list = obj_dims.doFilteredList(filter_num, avg_chi_list)
 
-# Reset all values in dictionary
-chi_zero_list = dict.fromkeys(filted_avg_list, 0.0)
-
 # Get database View List
 tfidf_viewlist = obj_db.getTFIDFViewList()
+
+# Length of vector dimension
+len_vd = len(filted_avg_list)
+
 for db_num in range(5):
+    # Reset all values in dictionary
+    chi_zero_list = dict.fromkeys(filted_avg_list, 0.0)
+
     sql_getContent = "SELECT `ClsNo1`, `ScoreContent` FROM `" + tfidf_viewlist[db_num] + "` ORDER BY RAND()"
 
     # Get connection cursor
@@ -118,11 +122,12 @@ for db_num in range(5):
     """
     sk_fold = cross_validation.StratifiedKFold(category_dataset, n_folds=10)
     data_name = (tfidf_viewlist[db_num]).replace('VIEW_CateTFIDF', '')
-    outfile = codecs.open('report/avg_sk_' + data_name + '_train_result.txt', 'w', 'utf-8')
+    print data_name + ":::::::::::::::::::::::::::::::"
+    outfile = codecs.open('report/avg_sk_' + data_name + '_' + str(len_vd) + '_train_result.txt', 'w', 'utf-8')
 
     outfile.write("Cross-validation: Stratified 10-fold CV\n")
     outfile.write('Avg CHI Static Score: ' + str(filter_num) + "\n")
-    outfile.write('Length of vector dimension: ' + str(len(filted_avg_list)) + "\n\n")
+    outfile.write('Length of vector dimension: ' + str(len_vd) + "\n\n")
 
     i = 1
     """
@@ -135,7 +140,7 @@ for db_num in range(5):
         train_set = getValiSetByIndexList(feature_dataset, category_dataset, train_index_list)
         clf.fit(train_set[0], train_set[1])
 
-        joblib.dump(clf, 'pickle/avg_sk_' + data_name + '_train_' + str(i) + '.pkl', compress=9)
+        joblib.dump(clf, 'pickle/avg_sk_' + data_name + '_' + str(len_vd) + '_train_' + str(i) + '.pkl', compress=9)
 
         test_set = getValiSetByIndexList(feature_dataset, category_dataset, test_index_list)
 
@@ -173,7 +178,8 @@ for db_num in range(5):
         outfile.write("C" + str(key) + ":\t\t%.2f +- %.2f \n" % (round(mean_ci[0], 2), round(mean_ci[1], 2)))
     avg_mean_ci = mean_confidence_interval(list_macro_avg_f1Soc)
     outfile.write("avg / total\t%.2f +- %.2f" % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
-    print list_macro_avg_f1Soc
+    print "avg / total\t%.2f +- %.2f" % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2))
+
     outfile.close()
 
     view_cursor.close()
