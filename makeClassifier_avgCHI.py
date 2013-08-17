@@ -20,7 +20,7 @@ conn = MySQLdb.connect(host="localhost",
 
 # Database number in View list
 """db_num = 1"""
-filter_num = 0.028
+filter_num = 0.027
 
 
 # Get TFIDF Score Vector by CHI term list

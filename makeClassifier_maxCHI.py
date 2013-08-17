@@ -20,7 +20,7 @@ conn = MySQLdb.connect(host="localhost",
 
 # Database number in View list
 """db_num = 2"""
-filter_num = 0.15
+filter_num = 0.108
 
 
 # Get TFIDF Score Vector by CHI term list
@@ -127,7 +127,7 @@ for db_num in range(5):
 
     outfile.write("Cross-validation: Stratified 10-fold CV\n")
     outfile.write('Max CHI Static Score filter: ' + str(filter_num) + "\n")
-    outfile.write('Length of vector dimension: ' + str(len(len_vd)) + "\n\n")
+    outfile.write('Length of vector dimension: ' + str(len_vd) + "\n\n")
 
     i = 1
     """

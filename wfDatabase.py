@@ -20,6 +20,9 @@ class wfdb():
         # TFIDF Score and category View name list
         self.tfidf_viewlist = ('VIEW_CateTFIDFTainan', 'VIEW_CateTFIDFPingtung', 'VIEW_CateTFIDFRicks', 'VIEW_CateTFIDFXditeCombine', 'VIEW_CateTFIDFAdct')
 
+        # Segment content and Date Time View name list
+        self.segdate_viewlist = ('VIEW_SegDateTainan', 'VIEW_SegDatePingtung', 'VIEW_SegDateRicks', 'VIEW_SegDateXditeCombine', 'VIEW_SegDateAdct')
+
     def getTableList(self):
         return self.dblist
 
@@ -28,3 +31,6 @@ class wfdb():
 
     def getTFIDFViewList(self):
         return self.tfidf_viewlist
+
+    def getSegDateViewList(self):
+        return self.segdate_viewlist
