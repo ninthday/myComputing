@@ -39,7 +39,11 @@ class MySQLConnector(object):
                 #this can be dangerous, but sources / executes lines in config.py, which contains the db info
                 #alternatively, you can just set the variables here manually
                 exec('%s = %s' % tuple(line.split('=', 1)))
-            MySQLConnector._connection = MySQLdb.connect(dbhost, dblogin, dbpassword, dbname, dbcharset)
+            MySQLConnector._connection = MySQLdb.connect(host=dbhost,
+                                                         user=dblogin,
+                                                         passwd=dbpassword,
+                                                         db=dbname,
+                                                         charset=dbcharset)
             if debug:
                 print "INFO: Database connection successfully established"
         except Exception, e:
@@ -93,6 +97,6 @@ class MySQLConnector(object):
     def queryrows(self, sql):
         cur = MySQLConnector._connection.cursor()
         cur.execute(sql)
-        return cur.fetchmany()
+        return cur.fetchall()
 
 #end class MySQLConnector

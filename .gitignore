@@ -38,6 +38,7 @@ nosetests.xml
 pickle/*
 report/*
 bak/*
+gexf/*
 
 # Ignore config
 includes/db_config.py
