@@ -23,6 +23,9 @@ class wfdb():
         # Segment content and Date Time View name list
         self.segdate_viewlist = ('VIEW_SegDateTainan', 'VIEW_SegDatePingtung', 'VIEW_SegDateRicks', 'VIEW_SegDateXditeCombine', 'VIEW_SegDateAdct')
 
+        # TFIDF Score Table Name list
+        self.dblist = ('TFIDFPingtungNSW', 'TFIDFTainanNSW', 'TFIDFRicksNSW', 'TFIDFXditeCombineNSW', 'TFIDFAdctNSW')
+
     def getTableList(self):
         return self.dblist
 
