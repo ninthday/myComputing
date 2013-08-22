@@ -39,6 +39,7 @@ pickle/*
 report/*
 bak/*
 gexf/*
+TFIDFList/*
 
 # Ignore config
 includes/db_config.py

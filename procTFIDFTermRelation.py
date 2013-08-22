@@ -8,7 +8,7 @@ import re
 import enchant
 
 # How many terms were you want to get
-limit = 200
+limit = 300
 
 mysql = MySQLConnector()
 
@@ -55,7 +55,7 @@ def generateGexf(list_terms, tb_name):
             list_intersec_index.sort()
 
         len_intersec_index = len(list_intersec_index)
-        print len_intersec_index
+        # print len_intersec_index
         for j in range(len_intersec_index - 1):
             for k in range(j + 1, len_intersec_index):
                 outfile.write('<edge id="%s" source="%s" target="%s" />\n' % (str(x), str(list_intersec_index[j]), str(list_intersec_index[k])))
@@ -92,6 +92,12 @@ for i in range(5):
     # Sort tfidf dictionary by tfidf score
     dict_sorted_tfidf = sorted(dict_tfidf.items(), key=lambda(k, v): (v, k), reverse=True)
 
+    # TFIDF Outfile
+    outfile_tfidf = codecs.open('TFIDFList/tfidf_' + tfidf_tblist[i] + '.txt', 'w', 'utf-8')
+    for key, val in dict_sorted_tfidf:
+        outfile_tfidf.write(key + ': ' + str(val) + '\n')
+    outfile_tfidf.close()
+
     # Get limit term list from sorted tfidf dictionary
     list_terms = []
     j = 1
@@ -104,3 +110,5 @@ for i in range(5):
     #print list_terms
 
     generateGexf(list_terms, seg_tblist[i])
+
+    print tfidf_tblist[i] + " - " + seg_tblist[i]
