@@ -24,7 +24,7 @@ class wfdb():
         self.segdate_viewlist = ('VIEW_SegDateTainan', 'VIEW_SegDatePingtung', 'VIEW_SegDateRicks', 'VIEW_SegDateXditeCombine', 'VIEW_SegDateAdct')
 
         # TFIDF Score Table Name list
-        self.dblist = ('TFIDFPingtungNSW', 'TFIDFTainanNSW', 'TFIDFRicksNSW', 'TFIDFXditeCombineNSW', 'TFIDFAdctNSW')
+        self.tfidf_tblist = ('TFIDFPingtungNSW', 'TFIDFTainanNSW', 'TFIDFRicksNSW', 'TFIDFXditeCombineNSW', 'TFIDFAdctNSW')
 
     def getTableList(self):
         return self.dblist
@@ -37,3 +37,7 @@ class wfdb():
 
     def getSegDateViewList(self):
         return self.segdate_viewlist
+
+
+    def getTFIDFTableList(self):
+        return self.tfidf_tblist
