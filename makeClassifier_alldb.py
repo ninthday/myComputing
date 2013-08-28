@@ -10,6 +10,7 @@ from wfMySQL import MySQLConnector
 import codecs
 import numpy as np
 import scipy.stats as sp
+from random import shuffle
 
 # Database number in View list
 """db_num = 1"""
@@ -59,6 +60,20 @@ def mean_confidence_interval(data, confidence=0.95):
     m, se = np.mean(a), sp.sem(a)
     h = se * sp.t._ppf((1 + confidence) / 2., n - 1)
     return [m, h, m - h, m + h]
+
+
+# Randomize feature and category dataset
+def randomizeDataset(feature_dataset, category_dataset):
+    random_list = range(len(category_dataset))
+    shuffle(random_list)
+    new_feature = []
+    new_category = []
+    for i in random_list:
+        new_feature.append(feature_dataset[i])
+        new_category.append(category_dataset[i])
+    feature_dataset[:] = []
+    category_dataset[:] = []
+    return new_feature, new_category
 
 # Instance dimension class
 obj_dims = dimension()
@@ -122,6 +137,11 @@ for db_num in range(5):
     print 'MAX_feature_dataset:' + str(len(max_feature_dataset))
     print 'MAX_category_dataset:' + str(len(max_category_dataset))
     """print category_dataset"""
+
+# Randomize dataset to avoid the same dataset data tied together
+avg_feature_dataset, avg_category_dataset = randomizeDataset(avg_feature_dataset, avg_category_dataset)
+max_feature_dataset, max_category_dataset = randomizeDataset(max_feature_dataset, max_category_dataset)
+
 
 """
 Use Scikit-learn python Mechine learning libreary to learning
