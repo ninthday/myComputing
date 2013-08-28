@@ -14,10 +14,10 @@ import scipy.stats as sp
 # Database number in View list
 """db_num = 1"""
 # Set average CHI Score filter threshold
-avg_filter_num = 0.027
+avg_filter_num = 0.0299
 
 # Set max CHI Score filter threshold
-max_filter_num = 0.108
+max_filter_num = 0.1394
 
 
 # Get TFIDF Score Vector by CHI term list
@@ -85,6 +85,9 @@ tfidf_viewlist = obj_db.getTFIDFViewList()
 # Length of vector dimension
 len_avg_vd = len(filted_avg_list)
 len_max_vd = len(filted_max_list)
+
+print 'Amount of Avg CHI is: ' + str(len_avg_vd)
+print 'Amount of Max CHI is: ' + str(len_max_vd)
 
 # Init feature and category dataset
 avg_feature_dataset = []

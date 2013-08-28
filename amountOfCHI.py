@@ -4,7 +4,7 @@
 from filter import dimension
 
 # Set amount for get average CHI score
-amtNum = 8000
+amtNum = 7002
 
 # Instance dimension Class
 obj_dims = dimension()

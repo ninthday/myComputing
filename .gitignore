@@ -40,6 +40,7 @@ report/*
 bak/*
 gexf/*
 TFIDFList/*
+compare/*
 
 # Ignore config
 includes/db_config.py
