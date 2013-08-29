@@ -137,11 +137,11 @@ for view_num in range(5):
         mean_ci = mean_confidence_interval(value, 0.95)
 
         print 'C' + str(key) + ':\t\t%.2f +- %.2f' % (round(mean_ci[0], 2), round(mean_ci[1], 2))
-        outfile.write('C' + str(key) + ':\t\t%.2f +- %.2f' % (round(mean_ci[0], 2), round(mean_ci[1], 2)))
+        outfile.write('C' + str(key) + ':\t\t%.2f +- %.2f\n' % (round(mean_ci[0], 2), round(mean_ci[1], 2)))
 
     avg_mean_ci = mean_confidence_interval(list_wtg_avg_f1Soc, 0.95)
     print 'avg / total\t\t%.2f +- %.2f' % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2))
-    outfile.write('avg / total\t\t%.2f +- %.2f' % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
+    outfile.write('avg / total\t\t%.2f +- %.2f\n' % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
 
     outfile.close()
 
@@ -187,10 +187,10 @@ for view_num in range(5):
         mean_ci = mean_confidence_interval(value, 0.95)
 
         print 'C' + str(key) + ':\t\t%.2f +- %.2f' % (round(mean_ci[0], 2), round(mean_ci[1], 2))
-        outfile.write('C' + str(key) + ':\t\t%.2f +- %.2f' % (round(mean_ci[0], 2), round(mean_ci[1], 2)))
+        outfile.write('C' + str(key) + ':\t\t%.2f +- %.2f\n' % (round(mean_ci[0], 2), round(mean_ci[1], 2)))
 
     avg_mean_ci = mean_confidence_interval(list_wtg_avg_f1Soc, 0.95)
     print 'avg / total\t\t%.2f +- %.2f' % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2))
-    outfile.write('avg / total\t\t%.2f +- %.2f' % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
+    outfile.write('avg / total\t\t%.2f +- %.2f\n' % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
 
     outfile.close()
