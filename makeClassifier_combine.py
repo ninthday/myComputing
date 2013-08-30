@@ -282,3 +282,6 @@ print "avg / total\t%.2f +- %.2f" % (round(avg_mean_ci[0], 2), round(avg_mean_ci
 
 max_sk_fold = cross_validation.StratifiedKFold(max_category_dataset, n_folds=10)
 outfile.close()
+
+# Close connection
+mysql.disconnect()

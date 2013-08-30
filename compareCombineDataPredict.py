@@ -194,3 +194,5 @@ for view_num in range(5):
     outfile.write('avg / total\t\t%.2f +- %.2f\n' % (round(avg_mean_ci[0], 2), round(avg_mean_ci[1], 2)))
 
     outfile.close()
+# Close connection
+mysql.disconnect()
