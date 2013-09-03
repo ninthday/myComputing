@@ -81,30 +81,41 @@ avg_all_predict = {}
 max_all_predict = {}
 
 for i in range(1, 11):
-    print 'Loading....avg_sk_all_7009_train_' + str(i) + '.pkl'
-    clf = joblib.load('pickle/avg_sk_all_7009_train_' + str(i) + '.pkl')
+    #print 'Loading....avg_sk_all_7009_train_' + str(i) + '.pkl'
+    #clf = joblib.load('pickle/avg_sk_all_7009_train_' + str(i) + '.pkl')
+    print 'Loading....max_sk_all_7002_train_' + str(i) + '.pkl'
+    clf = joblib.load('pickle/max_sk_all_7002_train_' + str(i) + '.pkl')
     print 'Load done.'
     for row in result:
         sid = int(row[0])
         seg_content = row[1]
         list_term_tfidf = seg_content.split("|")
-        avg_tfidf_score_vactor = getTFIDFScoreVector(dict_avg_zero, list_term_tfidf)
-        pred_result = clf.predict(avg_tfidf_score_vactor)
+        #avg_tfidf_score_vactor = getTFIDFScoreVector(dict_avg_zero, list_term_tfidf)
+        #pred_result = clf.predict(avg_tfidf_score_vactor)
+        max_tfidf_score_vactor = getTFIDFScoreVector(dict_max_zero, list_term_tfidf)
+        pred_result = clf.predict(max_tfidf_score_vactor)
+        """
         if sid in avg_all_predict:
             avg_all_predict[sid].append(int(pred_result[0]))
         else:
             avg_all_predict[sid] = [int(pred_result[0])]
+        """
+        if sid in max_all_predict:
+            max_all_predict[sid].append(int(pred_result[0]))
+        else:
+            max_all_predict[sid] = [int(pred_result[0])]
 
 # Most common value in Vote predict result
 vote_result = {}
-for key, value in avg_all_predict.items():
+#for key, value in avg_all_predict.items():
+for key, value in max_all_predict.items():
     vote_result[key] = most_common(value)
 
-print avg_all_predict
+print max_all_predict
 
 for key, value in vote_result.items():
     # print type(key), type(value)
-    sql_insert = unicode('INSERT INTO `CoderCompare`(`DBId`, `SamplingNo`, `ClsNo1`, `UserId`, `SettingTime`) VALUES (4,{0:d},{1:d},4,NOW())').format(key, value)
+    sql_insert = unicode('INSERT INTO `CoderCompare`(`DBId`, `SamplingNo`, `ClsNo1`, `UserId`, `SettingTime`) VALUES (4,{0:d},{1:d},5,NOW())').format(key, value)
     mysql.insert(sql_insert)
 
 mysql.disconnect()
